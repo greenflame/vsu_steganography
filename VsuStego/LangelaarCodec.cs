@@ -10,9 +10,9 @@ namespace VsuStego
     {
         public Bitmap Image { get; }
 
-        public Size BlockSize { get; }
+        public Size BlockSize { get; } = new Size(8 ,8);
 
-        public int PixelDistance { get; }
+        public int PixelDistance { get; } = 10;
 
         public int BlockDistance => PixelDistance * BlockLength;
 
@@ -35,9 +35,13 @@ namespace VsuStego
             PixelDistance = pixelDistance;
         }
 
+        public LangelaarCodec(Bitmap image)
+        {
+            Image = image;
+        }
+
         public override void Flush()
         {
-            throw new NotSupportedException();
         }
 
         public override long Seek(long offset, SeekOrigin origin)
@@ -95,7 +99,7 @@ namespace VsuStego
         private bool ReadBit(int block)
         {
             var indexes = Enumerable.Range(0, BlockLength).ToLookup(GetGroup).Select(i => i.ToList()).ToList();
-            var sum = indexes.Select(g => g.Select(p => GetPixel(block, p)).Select(GetBrightness).Sum()).ToList();
+            var sum = indexes.Select(g => g.Select(p => GetPixel(block, p)).Select(ImageHelper.GetBrightness).Sum()).ToList();
 
             return sum[0] < sum[1];
         }
@@ -103,8 +107,8 @@ namespace VsuStego
         private void WriteBit(int block, bool value)
         {
             var indexes = Enumerable.Range(0, BlockLength).ToLookup(GetGroup).Select(i => i.ToList()).ToList();
-            var sum = indexes.Select(g => g.Select(p => GetPixel(block, p)).Select(GetBrightness).Sum()).ToList();
-            var max = indexes.Select(g => g.Count * MaxBrightness).ToList();
+            var sum = indexes.Select(g => g.Select(p => GetPixel(block, p)).Select(ImageHelper.GetBrightness).Sum()).ToList();
+            var max = indexes.Select(g => g.Count * ImageHelper.MaxBrightness).ToList();
             var mid = sum.Sum() / sum.Count;
             var target = indexes.Select(_ => 0).ToList();
 
@@ -160,10 +164,7 @@ namespace VsuStego
         }
 
         private int GetGroup(int pixel) => (pixel % BlockSize.Width + pixel / BlockSize.Width) % 2;
-
-        private static int GetBrightness(Color color) => color.R + color.G + color.B;
-
-        private static int MaxBrightness => byte.MaxValue * 3;
+        //private int GetGroup(int pixel) => pixel < BlockLength / 2 ? 0 : 1;
 
         private void SetPixel(int block, int pixel, Color color) =>
             Image.SetPixel(GetX(block, pixel), GetY(block, pixel), color);
