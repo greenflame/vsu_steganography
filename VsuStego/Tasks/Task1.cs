@@ -11,8 +11,8 @@ namespace VsuStego.Tasks
     {
         public void Run()
         {
-            Console.WriteLine("Signing");
-            Encode("flowers.jpg", "signed.jpg");
+            //Console.WriteLine("Signing");
+            //Encode("flowers.jpg", "signed.jpg");
 
             Console.WriteLine("Checking");
             Decode("signed.jpg", "validated.jpg");

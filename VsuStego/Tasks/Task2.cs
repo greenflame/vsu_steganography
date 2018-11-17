@@ -27,7 +27,7 @@ namespace VsuStego.Tasks
                 g.FillRectangle(new SolidBrush(Color.Black), rect);
             }
 
-            var codec = new LangelaarCodec(originalImage, new Size(8, 8), 100);
+            var codec = new LangelaarCodec(originalImage, new Size(8, 8), 10);
 
             subImage.SaveJpeg(codec, 10);
             

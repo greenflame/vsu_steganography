@@ -7,7 +7,7 @@ namespace VsuStego
     {
         static void Main()
         {
-            ITask task = new Task1();
+            ITask task = new Task3();
             task.Run();
 
             Console.WriteLine("ok");
