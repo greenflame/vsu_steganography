@@ -124,6 +124,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Helpers\JpegHelper.cs" />
     <Compile Include="LangelaarCodec.cs" />
     <Compile Include="Helpers\ImageHelper.cs" />
     <Compile Include="Helpers\BitHelper.cs" />
@@ -135,6 +136,7 @@
     <Compile Include="Tasks\Task2.cs" />
     <Compile Include="Tasks\Task3.cs" />
     <Compile Include="Tasks\Task4.cs" />
+    <Compile Include="Tasks\Task4_.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
