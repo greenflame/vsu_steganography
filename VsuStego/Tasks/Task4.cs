@@ -1,13 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading;
 using BitMiracle.LibJpeg.Classic;
 using VsuStego.Helpers;
 
@@ -25,7 +20,7 @@ namespace VsuStego.Tasks
 
             var channels = coefficients.Take(3).Select(JpegHelper.GetBuffer).ToArray();
 
-            var str = "Hello, world!";
+            var str = string.Join(" ", Enumerable.Range(0, 100).Select(_ => "Hello, world!"));
 
             Encrypt(channels, Encoding.ASCII.GetBytes(str));
 
@@ -50,9 +45,13 @@ namespace VsuStego.Tasks
         {
             new[]
             {
-                0, 1, 2,
-                8, 9, 10,
-                16, 17, 18
+                0, 1, 2, 3, 4, 5, 6,
+                8, 9, 10, 11, 12, 13,
+                16, 17, 18, 19, 20,
+                32, 33, 34, 35,
+                40, 41, 42,
+                48, 49,
+                56
             }
         };
 
@@ -70,6 +69,11 @@ namespace VsuStego.Tasks
             {
                 var block = JpegHelper.GetBlock(coefficients, i);
                 Encrypt(block, data.Skip(i * BytesPerBlock).Take(BytesPerBlock).ToArray());
+
+                if (i % 100 == 0)
+                {
+                    Console.WriteLine($"{i} bytes encrypted");
+                }
             }
         }
 
@@ -77,13 +81,14 @@ namespace VsuStego.Tasks
         {
             for (var i = 0; i < Groups.Length; i++)
             {
-                var currentGroupData = data.Skip(i + BytesPerGroup).Take(BytesPerGroup).ToArray();
+                var currentGroupData = data.Skip(i * BytesPerGroup).Take(BytesPerGroup).ToArray();
                 var group = Groups[i];
                 var tries = 0;
 
                 while (!Hash(block, group).SequenceEqual(currentGroupData))
                 {
-                    block[group[Random.Next(group.Length)]] += (short) Random.Next(-1, 1);
+                    var index = @group[Random.Next(@group.Length)];
+                    block[index] += (short) Random.Next(-1, 1);
 
                     tries++;
                     if (tries > 10000000)
@@ -91,8 +96,6 @@ namespace VsuStego.Tasks
                         throw new Exception("Max tries reached");
                     }
                 }
-
-                Console.WriteLine("byte encrypted");
             }
         }
 
@@ -120,7 +123,7 @@ namespace VsuStego.Tasks
                     ms.Write(h, 0, h.Length);
                 }
 
-                return ms.GetBuffer();
+                return ms.GetBuffer().Take(BytesPerBlock).ToArray();
             }
         }
 
@@ -131,6 +134,8 @@ namespace VsuStego.Tasks
             using (var md5 = MD5.Create())
             {
                 group.Select(i => block[i]).ToList().ForEach(sw.Write);
+                sw.Flush();
+                ms.Seek(0, SeekOrigin.Begin);
                 return md5.ComputeHash(ms).Take(BytesPerGroup).ToArray();
             }
         }

@@ -11,9 +11,9 @@ namespace VsuStego.Tasks
     {
         public void Run()
         {
-            //BruteForce("", "__encrypted");
-            //Decode("", "1123987664", "__encrypted", "dectypted.jpg");
-            BatchDecode("", "res.txt", "__encrypted");
+            //BruteForce(" ", "__encrypted");
+            Decode(" ", "1557075050", "__encrypted", "dectypted.jpg");
+            //BatchDecode("", "res2.txt", "__encrypted");
         }
 
         private void Decode(string salt, string key, string input, string output)
@@ -64,7 +64,7 @@ namespace VsuStego.Tasks
             Console.WriteLine("Threads:");
             var threads = Convert.ToInt32(Console.ReadLine());
 
-            Parallel.ForEach(Enumerable.Range(start, int.MaxValue / step),
+            Parallel.ForEach(Enumerable.Range(start / step, int.MaxValue / step),
                 new ParallelOptions {MaxDegreeOfParallelism = threads},
                 batchInd =>
                 {
@@ -115,6 +115,24 @@ namespace VsuStego.Tasks
                 if (tmpBuf[0] == 137 && tmpBuf[1] == 80 && tmpBuf[2] == 78)
                 {
                     Console.WriteLine("Png detected");
+                    return true;
+                }
+
+                if (tmpBuf[0] == 71 && tmpBuf[1] == 73 && tmpBuf[2] == 70)
+                {
+                    Console.WriteLine("Gif detected");
+                    return true;
+                }
+
+                if (tmpBuf[0] == 60 && tmpBuf[1] == 115 && tmpBuf[2] == 118)
+                {
+                    Console.WriteLine("Svg detected");
+                    return true;
+                }
+
+                if (tmpBuf[0] == 60 && tmpBuf[1] == 120 && tmpBuf[2] == 109)
+                {
+                    Console.WriteLine("Xml detected");
                     return true;
                 }
             }
