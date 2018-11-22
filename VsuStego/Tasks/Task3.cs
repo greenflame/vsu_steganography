@@ -11,9 +11,12 @@ namespace VsuStego.Tasks
     {
         public void Run()
         {
-            //BruteForce(" ", "__encrypted");
-            Decode(" ", "1557075050", "__encrypted", "dectypted.jpg");
-            //BatchDecode("", "res2.txt", "__encrypted");
+            var salt = " ";
+            var encryptedFileName = "__encrypted";
+
+            BruteForce(salt, encryptedFileName);
+            //Decode(salt, "1557075050", encryptedFileName, "dectypted.jpg");
+            //BatchDecode(salt, "res2.txt", encryptedFileName);
         }
 
         private void Decode(string salt, string key, string input, string output)
@@ -24,7 +27,7 @@ namespace VsuStego.Tasks
             {
                 aes.Padding = PaddingMode.Zeros;
 
-                var iv = md5.ComputeHash(Encoding.ASCII.GetBytes(""));
+                var iv = md5.ComputeHash(Encoding.ASCII.GetBytes(salt));
                 var k = md5.ComputeHash(Encoding.ASCII.GetBytes(key));
 
                 aes.Key = k;
