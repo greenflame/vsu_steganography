@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace VsuStego.Tasks
@@ -14,9 +15,30 @@ namespace VsuStego.Tasks
             var salt = " ";
             var encryptedFileName = "__encrypted";
 
-            BruteForce(salt, encryptedFileName);
+            //BruteForce(salt, encryptedFileName);
             //Decode(salt, "1557075050", encryptedFileName, "dectypted.jpg");
-            //BatchDecode(salt, "res2.txt", encryptedFileName);
+            BatchDecode(salt, "log.txt", encryptedFileName);
+        }
+
+        private readonly ReaderWriterLock _locker = new ReaderWriterLock();
+
+        private void Log(string[] lines)
+        {
+            try
+            {
+                _locker.AcquireWriterLock(TimeSpan.FromSeconds(10));
+                lines.ToList().ForEach(Console.WriteLine);
+                File.AppendAllLines("log.txt", lines);
+            }
+            finally
+            {
+                _locker.ReleaseWriterLock();
+            }
+        }
+
+        private void Log(string line)
+        {
+            Log(new[] {line});
         }
 
         private void Decode(string salt, string key, string input, string output)
@@ -53,18 +75,18 @@ namespace VsuStego.Tasks
 
             for (var i = 0; i < keys.Count; i++)
             {
-                Decode(salt, keys[i], input, $"out\\{keys[i]}.png");
-                Console.Out.WriteLine($"Decoded: {i} of {keys.Count}");
+                Decode(salt, keys[i], input, $"out\\{keys[i]}.jpg");
+                Log($"Decoded: {i} of {keys.Count}");
             }
         }
 
-        private static void BruteForce(string salt, string input)
+        private void BruteForce(string salt, string input)
         {
-            Console.WriteLine("Start pos:");
+            Log("Start pos:");
             var start = Convert.ToInt32(Console.ReadLine());
-            Console.WriteLine("Step:");
+            Log("Step:");
             var step = Convert.ToInt32(Console.ReadLine());
-            Console.WriteLine("Threads:");
+            Log("Threads:");
             var threads = Convert.ToInt32(Console.ReadLine());
 
             Parallel.ForEach(Enumerable.Range(start / step, int.MaxValue / step),
@@ -87,16 +109,16 @@ namespace VsuStego.Tasks
 
                             if (Check(aes, inputStream, key, iv, tmpBuf))
                             {
-                                Console.WriteLine($"RESULT: {i}");
+                                Log($"RESULT: {i}");
                             }
                         }
 
-                        Console.WriteLine($"{batchInd} processed");
+                        Log($"{batchInd} processed");
                     }
                 });
         }
 
-        static bool Check(Aes aes, Stream input, byte[] Key, byte[] IV, byte[] tmpBuf)
+        private bool Check(Aes aes, Stream input, byte[] Key, byte[] IV, byte[] tmpBuf)
         {
             aes.Key = Key;
             aes.IV = IV;
@@ -111,31 +133,31 @@ namespace VsuStego.Tasks
 
                 if (tmpBuf[0] == 255 && tmpBuf[1] == 216 && tmpBuf[2] == 255)
                 {
-                    Console.WriteLine("Jpeg detected");
+                    Log("Jpeg detected");
                     return true;
                 }
 
                 if (tmpBuf[0] == 137 && tmpBuf[1] == 80 && tmpBuf[2] == 78)
                 {
-                    Console.WriteLine("Png detected");
+                    Log("Png detected");
                     return true;
                 }
 
                 if (tmpBuf[0] == 71 && tmpBuf[1] == 73 && tmpBuf[2] == 70)
                 {
-                    Console.WriteLine("Gif detected");
+                    Log("Gif detected");
                     return true;
                 }
 
                 if (tmpBuf[0] == 60 && tmpBuf[1] == 115 && tmpBuf[2] == 118)
                 {
-                    Console.WriteLine("Svg detected");
+                    Log("Svg detected");
                     return true;
                 }
 
                 if (tmpBuf[0] == 60 && tmpBuf[1] == 120 && tmpBuf[2] == 109)
                 {
-                    Console.WriteLine("Xml detected");
+                    Log("Xml detected");
                     return true;
                 }
             }

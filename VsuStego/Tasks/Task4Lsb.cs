@@ -7,7 +7,7 @@ using VsuStego.Helpers;
 
 namespace VsuStego.Tasks
 {
-    public class Task4_ : ITask
+    public class Task4Lsb : ITask
     {
         public void Run()
         {

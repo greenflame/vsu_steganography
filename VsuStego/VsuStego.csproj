@@ -125,6 +125,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Helpers\JpegHelper.cs" />
+    <Compile Include="HighCapacityJpegCodec.cs" />
     <Compile Include="LangelaarCodec.cs" />
     <Compile Include="Helpers\ImageHelper.cs" />
     <Compile Include="Helpers\BitHelper.cs" />
@@ -136,7 +137,7 @@
     <Compile Include="Tasks\Task2.cs" />
     <Compile Include="Tasks\Task3.cs" />
     <Compile Include="Tasks\Task4.cs" />
-    <Compile Include="Tasks\Task4_.cs" />
+    <Compile Include="Tasks\Task4Lsb.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

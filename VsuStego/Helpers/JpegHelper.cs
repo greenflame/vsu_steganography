@@ -13,11 +13,6 @@ namespace VsuStego.Helpers
             return (JBLOCK[][])propertyInfo?.GetValue(arr);
         }
 
-        private static int GetLength(this JBLOCK[][] arr)
-        {
-            return arr.Length * arr.First().Length;
-        }
-
         public static JBLOCK GetBlock(JBLOCK[][][] arr, int ind)
         {
             var pos = 0;
@@ -38,6 +33,11 @@ namespace VsuStego.Helpers
         public static int GetLength(JBLOCK[][][] arr)
         {
             return arr.Select(GetLength).Sum();
+        }
+
+        private static int GetLength(this JBLOCK[][] arr)
+        {
+            return arr.Length * arr.First().Length;
         }
     }
 }
